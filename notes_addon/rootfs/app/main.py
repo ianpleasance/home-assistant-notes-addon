@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 # Get the notes directory from the environment variable set by run.sh
 NOTES_DIR = os.environ.get('NOTES_DIR', '/data/notes_data') # Fallback if not set, though run.sh should set it
 
-@app.before_first_request
+@app.before_request
 def setup_notes_directory():
     """Ensures the notes directory exists before the first request."""
     try:

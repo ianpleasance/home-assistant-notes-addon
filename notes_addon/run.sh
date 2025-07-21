@@ -1,25 +1,20 @@
-#!/usr/bin/with-contenv bashio
+#!/bin/bash
 
-# Get the configured path for notes within the Home Assistant config directory
-# Default to 'notes' if not set by the user
-CONFIG_NOTES_PATH=$(bashio::config 'homeassistant_config_notes_path')
-if [ -z "${CONFIG_NOTES_PATH}" ]; then
-    CONFIG_NOTES_PATH="notes"
-    bashio::log.warning "homeassistant_config_notes_path not set, defaulting to 'notes'."
-fi
+# Temporarily comment out bashio calls to isolate Flask error
+# CONFIG_NOTES_PATH=$(bashio::config 'homeassistant_config_notes_path')
+# if [ -z "${CONFIG_NOTES_PATH}" ]; then
+#     CONFIG_NOTES_PATH="notes"
+#     bashio::log.warning "homeassistant_config_notes_path not set, defaulting to 'notes'."
+# fi
 
-# The /config directory inside the addon container is mapped to Home Assistant's /config
-# So, construct the full path for notes.
-NOTES_DATA_DIR="/config/${CONFIG_NOTES_PATH}"
+# For now, hardcode NOTES_DATA_DIR for testing Flask
+NOTES_DATA_DIR="/config/notes" # Default value
 
-# Ensure the notes data directory exists
-mkdir -p "${NOTES_DATA_DIR}" || bashio::exit.fatal "Failed to create notes data directory at ${NOTES_DATA_DIR}."
+mkdir -p "${NOTES_DATA_DIR}" || exit 1 # Simplified error handling for test
 
-bashio::log.info "Notes will be stored in: ${NOTES_DATA_DIR}"
+echo "Notes will be stored in: ${NOTES_DATA_DIR}" # Use echo instead of bashio::log
 
-# Set an environment variable for the Flask app to use
 export NOTES_DIR="${NOTES_DATA_DIR}"
 
-# Run the Flask application
-bashio::log.info "Starting Notes Addon..."
+echo "Starting Notes Addon..." # Use echo instead of bashio::log
 exec python3 /app/main.py
