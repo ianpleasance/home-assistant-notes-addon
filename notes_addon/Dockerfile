@@ -12,8 +12,14 @@ RUN pip install --break-system-packages Flask==2.3.3
 # Copy application files
 COPY rootfs/app /app
 
+# Copy the run.sh script to the root
+COPY run.sh /run.sh
+
 # Ensure correct permissions for the app directory
 RUN chmod -R 755 /app
+
+# Ensure run.sh is executable
+RUN chmod +x /run.sh
 
 # Expose the port Flask will run on
 EXPOSE 8099
