@@ -1,6 +1,8 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, send_file # Added send_file for export
 import logging
+from zipfile import ZipFile # Added for export functionality
+import io # Added for export functionality
 
 # --- NEW CUSTOM WSGI MIDDLEWARE ---
 class ReverseProxied:
@@ -106,7 +108,9 @@ def get_all_notes():
                     filepath = os.path.join(NOTES_DIR, filename)
                     with open(filepath, 'r', encoding='utf-8') as f:
                         content = f.read()
-                    notes.append({'filename': filename, 'content': content})
+                    # Extract title from the first line for display in index.html
+                    title = content.split('\n')[0].strip() if content else filename.replace('.txt', '')
+                    notes.append({'filename': filename, 'content': content, 'title': title})
                 except Exception as e:
                     app.logger.error(f"Error reading note {filename}: {e}")
     return notes
@@ -123,10 +127,20 @@ def index():
 def create_note():
     """Handles creating new notes."""
     if request.method == 'POST':
-        title = request.form['title']
+        # Extract title from the first line of content
+        title = request.form['content'].split('\n')[0].strip()
         content = request.form['content']
-        # Use a default title if none is provided
-        filename = f"{title}.txt" if title.strip() else "untitled.txt"
+        
+        # Determine filename, ensure it's not empty and ends with .txt
+        filename_base = title if title.strip() else "untitled_note" 
+        
+        # Ensure filename is unique
+        filename = f"{filename_base}.txt"
+        counter = 0
+        while os.path.exists(os.path.join(NOTES_DIR, filename)):
+            counter += 1
+            filename = f"{filename_base}_{counter}.txt"
+
         filepath = os.path.join(NOTES_DIR, filename)
 
         try:
@@ -138,7 +152,8 @@ def create_note():
             app.logger.error(f"Error creating note '{filename}': {e}")
             return "Error creating note", 500
     # For GET requests, render the form to create a new note
-    return render_template('edit_note.html', note={})
+    # IMPORTANT: Pass an empty 'filename' so 'if note.filename' works for new notes
+    return render_template('edit_note.html', note={'filename': '', 'content': ''})
 
 @app.route('/edit/<filename>', methods=['GET', 'POST'])
 def edit_note(filename):
@@ -159,6 +174,7 @@ def edit_note(filename):
         try:
             with open(filepath, 'r', encoding='utf-8') as f:
                 content = f.read()
+            # Pass filename explicitly to the template for correct form action
             note = {'filename': filename, 'content': content}
             return render_template('edit_note.html', note=note)
         except FileNotFoundError:
@@ -197,6 +213,9 @@ def import_note():
             filename = file.filename
             filepath = os.path.join(NOTES_DIR, filename)
             try:
+                # IMPORTANT: Consider security for imported files. 
+                # Ensure files are .txt or known safe types.
+                # Avoid direct execution or serving arbitrary files.
                 file.save(filepath)
                 app.logger.info(f"File '{filename}' imported successfully.")
                 return redirect(url_for('index'))
@@ -206,6 +225,29 @@ def import_note():
     # For GET requests (or if POST fails without file), redirect to index
     return redirect(url_for('index'))
 
+@app.route('/export_notes') # <--- THIS IS THE ROUTE THAT WAS MISSING
+def export_notes():
+    """Exports all notes as a zip file."""
+    app.logger.info("Export notes functionality requested.")
+    
+    # You'll need to implement the actual zipping and sending logic here.
+    # This is a basic implementation to get it working and avoid the 500 error.
+    # It creates a zip in memory and sends it.
+    
+    data = io.BytesIO()
+    with ZipFile(data, 'w') as zipf:
+        if os.path.exists(NOTES_DIR):
+            for filename in os.listdir(NOTES_DIR):
+                filepath = os.path.join(NOTES_DIR, filename)
+                if os.path.isfile(filepath) and filename.endswith(".txt"): # Only zip .txt files
+                    try:
+                        zipf.write(filepath, arcname=filename) # arcname makes it just the filename in the zip
+                    except Exception as e:
+                        app.logger.error(f"Error adding {filename} to zip: {e}")
+    data.seek(0) # Rewind the in-memory file to the beginning
+    
+    return send_file(data, mimetype='application/zip', as_attachment=True, download_name='all_notes.zip')
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8099)
-
