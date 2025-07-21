@@ -7,7 +7,7 @@ ENV LANG C.UTF-8
 RUN apk add --no-cache python3 py3-pip
 
 # Install Flask
-RUN pip install Flask==2.3.3
+RUN pip install --break-system-packages Flask==2.3.3
 
 # Copy application files
 COPY rootfs/app /app
