@@ -19,7 +19,7 @@
   "privileged": [],
   "host_network": false,
   "apparmor": false,
-  "webui": "[PROTO:http]://[HOST]:8099",
+  "webui": "[PROTO:http]://[HOST]:[PORT:8099]",
   "map": ["ssl:rw", "media:rw", "config:rw"],
   "init": false,
   "ingress": true,
