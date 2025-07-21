@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ "Edit Note" if note.id else "Create New Note" }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialdesignicons/7.4.47/css/materialdesignicons.min.css" integrity="sha512-Y3U72aBvN1W/1pP/Kz/jH/l2O1uB4oG2/K2k0Q82H+gO5p1T1t00x/w1L0b7k4dJ2l3c7p7Z1g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>{{ "Edit Note" if note.id else "Create New Note" }}</h1>
+        <form action="{{ url_for('edit_note', note_id=note.id) if note.id else url_for('new_note') }}" method="post">
+            <textarea name="content" placeholder="Enter your note here. The first line will be the title. You can use HTML!" required>{{ note.content | e }}</textarea><br>
+            <div class="buttons-container">
+                <button type="submit" class="button primary-button">Save Note</button>
+                <a href="/" class="button secondary-button">Cancel</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

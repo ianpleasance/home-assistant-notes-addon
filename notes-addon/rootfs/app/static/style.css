@@ -1,0 +1,219 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--card-background-color, #f0f2f5); /* Home Assistant light theme background */
+    color: var(--primary-text-color, #212121);
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: var(--card-background-color, #ffffff);
+    border-radius: 8px;
+    box-shadow: var(--ha-card-box-shadow, 0px 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+h1 {
+    color: var(--primary-color, #03a9f4); /* Home Assistant blue */
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--divider-color, #e0e0e0);
+    padding-bottom: 10px;
+}
+
+.actions-bar {
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+    gap: 10px; /* Space between buttons */
+    margin-bottom: 20px;
+    flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+}
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    border: none;
+    font-size: 1em;
+    white-space: nowrap; /* Prevent button text from wrapping */
+}
+
+.primary-button {
+    background-color: var(--primary-color, #03a9f4);
+    color: var(--text-primary-color, #ffffff);
+}
+
+.primary-button:hover {
+    background-color: var(--primary-color-dark, #0288d1);
+}
+
+.secondary-button {
+    background-color: var(--secondary-background-color, #e0e0e0);
+    color: var(--primary-text-color, #212121);
+}
+
+.secondary-button:hover {
+    background-color: var(--light-grey-color, #c0c0c0);
+}
+
+.button .mdi {
+    margin-right: 8px;
+    font-size: 1.2em;
+}
+
+.import-form {
+    display: inline-flex; /* To align with other buttons */
+}
+.import-form label {
+    cursor: pointer;
+    margin: 0; /* Override default label margin */
+}
+
+
+.notes-list {
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 4px;
+    margin-top: 20px;
+}
+
+.note-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--divider-color, #e0e0e0);
+    background-color: var(--background-color, #ffffff);
+}
+
+.note-item:last-child {
+    border-bottom: none;
+}
+
+.note-title {
+    flex-grow: 1;
+    font-weight: 500;
+    color: var(--primary-text-color, #212121);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 10px; /* Space before icons */
+}
+
+.note-actions {
+    display: flex;
+    gap: 5px; /* Space between icons */
+}
+
+.icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%; /* Make them round */
+    color: var(--secondary-text-color, #757575);
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.icon-button:hover {
+    background-color: var(--action-color-hover, rgba(0, 0, 0, 0.04));
+    color: var(--primary-color, #03a9f4);
+}
+
+.delete-button:hover {
+    color: var(--error-color, #f44336); /* Red for delete */
+}
+
+.mdi {
+    font-size: 24px; /* Standard icon size */
+}
+
+textarea {
+    width: calc(100% - 20px); /* Account for padding */
+    min-height: 250px;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color, #bdbdbd);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 1em;
+    box-sizing: border-box; /* Include padding in width/height */
+    resize: vertical; /* Allow vertical resizing */
+    color: var(--primary-text-color, #212121);
+    background-color: var(--text-field-background-color, #fafafa);
+}
+
+textarea:focus {
+    border-color: var(--primary-color, #03a9f4);
+    outline: none;
+    box-shadow: 0 0 0 1px var(--primary-color, #03a9f4);
+}
+
+.buttons-container {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end; /* Align buttons to the right */
+}
+
+.no-notes {
+    text-align: center;
+    padding: 20px;
+    color: var(--secondary-text-color, #757575);
+}
+
+/* Basic Dark Mode Adaptations (Home Assistant provides CSS variables) */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: var(--dark-app-background-color, #1c1c1c);
+        color: var(--dark-primary-text-color, #e0e0e0);
+    }
+    .container {
+        background-color: var(--dark-card-background-color, #2b2b2b);
+        box-shadow: var(--dark-ha-card-box-shadow, 0px 2px 4px rgba(0, 0, 0, 0.2));
+    }
+    h1 {
+        border-bottom-color: var(--dark-divider-color, #424242);
+    }
+    .primary-button {
+        background-color: var(--dark-primary-color, #4fc3f7); /* Lighter blue for dark mode */
+        color: var(--dark-text-primary-color, #121212);
+    }
+    .primary-button:hover {
+        background-color: var(--dark-primary-color-dark, #29b6f6);
+    }
+    .secondary-button {
+        background-color: var(--dark-secondary-background-color, #424242);
+        color: var(--dark-primary-text-color, #e0e0e0);
+    }
+    .secondary-button:hover {
+        background-color: var(--dark-light-grey-color, #5c5c5c);
+    }
+    .notes-list {
+        border-color: var(--dark-border-color, #424242);
+    }
+    .note-item {
+        border-bottom-color: var(--dark-divider-color, #424242);
+        background-color: var(--dark-background-color, #2b2b2b);
+    }
+    textarea {
+        border-color: var(--dark-border-color, #616161);
+        color: var(--dark-primary-text-color, #e0e0e0);
+        background-color: var(--dark-text-field-background-color, #383838);
+    }
+    textarea:focus {
+        border-color: var(--dark-primary-color, #4fc3f7);
+        box-shadow: 0 0 0 1px var(--dark-primary-color, #4fc3f7);
+    }
+    .icon-button:hover {
+        background-color: var(--dark-action-color-hover, rgba(255, 255, 255, 0.08));
+        color: var(--dark-primary-color, #4fc3f7);
+    }
+}

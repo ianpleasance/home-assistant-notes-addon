@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Assistant Notes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialdesignicons/7.4.47/css/materialdesignicons.min.css" integrity="sha512-Y3U72aBvN1W/1pP/Kz/jH/l2O1uB4oG2/K2k0Q82H+gO5p1T1t00x/w1L0b7k4dJ2l3c7p7Z1g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>My Notes</h1>
+        <div class="actions-bar">
+            <a href="/new" class="button primary-button">
+                <span class="mdi mdi-plus-circle"></span> Create New Note
+            </a>
+            <a href="/export_notes" class="button secondary-button">
+                <span class="mdi mdi-download"></span> Export All Notes
+            </a>
+            <form action="/import_notes" method="post" enctype="multipart/form-data" class="import-form">
+                <label for="zip_file" class="button secondary-button">
+                    <span class="mdi mdi-upload"></span> Import Notes
+                </label>
+                <input type="file" id="zip_file" name="zip_file" accept=".zip" style="display: none;" onchange="this.form.submit();">
+            </form>
+        </div>
+
+        {% if notes %}
+            <div class="notes-list">
+                {% for note in notes %}
+                    <div class="note-item">
+                        <div class="note-title">{{ note.title }}</div>
+                        <div class="note-actions">
+                            <a href="/edit/{{ note.id }}" title="Edit Note" class="icon-button">
+                                <span class="mdi mdi-pencil"></span>
+                            </a>
+                            <a href="/delete/{{ note.id }}" title="Delete Note" class="icon-button delete-button" onclick="return confirm('Are you sure you want to delete this note? This action cannot be undone.');">
+                                <span class="mdi mdi-delete"></span>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="no-notes">No notes yet. Click "Create New Note" to add one!</p>
+        {% endif %}
+    </div>
+</body>
+</html>
