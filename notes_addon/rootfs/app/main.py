@@ -1,7 +1,6 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for
 import logging
-# from werkzeug.middleware.proxy_fix import ProxyFix # We no longer need ProxyFix for this specific issue
 
 # --- NEW CUSTOM WSGI MIDDLEWARE ---
 class ReverseProxied:
@@ -12,17 +11,41 @@ class ReverseProxied:
     """
     def __init__(self, app):
         self.app = app
+        self.logger = logging.getLogger(__name__)
 
     def __call__(self, environ, start_response):
-        script_name = environ.get('X-Ingress-Path', '')
+        self.logger.info("DEBUG - Inside ReverseProxied middleware: START")
+
+        # --- EXHAUSTIVE ENVIRON LOGGING ---
+        self.logger.info("DEBUG - Dumping relevant environ keys:")
+        # Log ALL keys in environ, not just HTTP_ and specific ones, to be absolutely sure
+        for key, value in environ.items():
+            self.logger.info(f"DEBUG - Environ: {key} = '{value}'")
+        # --- END EXHAUSTIVE ENVIRON LOGGING ---
+
+        # Attempt to get the ingress path from environment
+        # Try common variations for the header name within the WSGI environ
+        script_name = environ.get('HTTP_X_INGRESS_PATH', '')
+        if not script_name: # Fallback if not found under standard WSGI header name
+            script_name = environ.get('X_INGRESS_PATH', '') # Some servers might pass it without HTTP_ prefix or with underscores
+        if not script_name: # Final fallback for raw header name, though unlikely for WSGI environ
+             script_name = environ.get('X-Ingress-Path', '')
+
+        self.logger.info(f"DEBUG - Middleware detected script_name (attempted from environ): '{script_name}'")
+
         if script_name:
             environ['SCRIPT_NAME'] = script_name
-            # Correct PATH_INFO if it starts with the script_name (important for sub-paths)
+            # Correct PATH_INFO if it starts with the script_name
             path_info = environ.get('PATH_INFO', '')
             if path_info.startswith(script_name):
                 environ['PATH_INFO'] = path_info[len(script_name):]
-            # Flask uses APPLICATION_ROOT internally for url_for, set it explicitly
+            # Flask uses APPLICATION_ROOT internally for url_for
             environ['APPLICATION_ROOT'] = script_name
+            self.logger.info(f"DEBUG - Middleware SET SCRIPT_NAME to: '{environ['SCRIPT_NAME']}'")
+        else:
+            self.logger.warning("DEBUG - Middleware: HTTP_X_INGRESS_PATH (or alternatives) not found or empty in environ.")
+
+        self.logger.info("DEBUG - Inside ReverseProxied middleware: END")
         return self.app(environ, start_response)
 # --- END NEW CUSTOM WSGI MIDDLEWARE ---
 
@@ -34,10 +57,8 @@ app = Flask(__name__,
             static_folder=os.path.join(BASE_DIR, 'static'),    # Explicit absolute path
             template_folder=os.path.join(BASE_DIR, 'templates')) # Explicit absolute path
 
-# --- APPLY THE CUSTOM MIDDLEWARE ---
+# APPLY THE CUSTOM MIDDLEWARE
 app.wsgi_app = ReverseProxied(app.wsgi_app)
-# --- END APPLY CUSTOM MIDDLEWARE ---
-
 
 # Configure logging to stdout, which Docker captures.
 logging.basicConfig(level=logging.INFO,
@@ -45,17 +66,21 @@ logging.basicConfig(level=logging.INFO,
                     handlers=[logging.StreamHandler()])
 app.logger.setLevel(logging.INFO)
 
-# --- DEBUGGING LOGS (KEEP THESE for now to verify the fix) ---
+# --- DEBUGGING LOGS (Keep these to see Flask's final state) ---
 @app.before_request
-def log_ingress_path_and_request_info():
-    app.logger.info(f"DEBUG - Full Request URL: {request.url}")
-    app.logger.info(f"DEBUG - Request Path (after ingress prefix removal): {request.path}")
-    app.logger.info(f"DEBUG - Script Root (Ingress Prefix detected by Custom Middleware): {request.script_root}") # Updated description
-    app.logger.info(f"DEBUG - Base URL (including ingress prefix): {request.base_url}")
+def log_request_info_after_middleware():
+    app.logger.info(f"DEBUG - Full Request URL (Flask's view): {request.url}")
+    app.logger.info(f"DEBUG - Request Path (Flask's view): {request.path}")
+    app.logger.info(f"DEBUG - Script Root (Flask's view after middleware): {request.script_root}")
+    app.logger.info(f"DEBUG - Base URL (Flask's view): {request.base_url}")
     if 'X-Ingress-Path' in request.headers:
-        app.logger.info(f"DEBUG - X-Ingress-Path Header from HA: {request.headers['X-Ingress-Path']}")
+        app.logger.info(f"DEBUG - X-Ingress-Path Header (Flask's view - direct header access): {request.headers['X-Ingress-Path']}")
     else:
-        app.logger.info("DEBUG - X-Ingress-Path Header from HA: NOT FOUND")
+        app.logger.info("DEBUG - X-Ingress-Path Header (Flask's view - direct header access): NOT FOUND (in request.headers)")
+    # This will log all HTTP_ headers that Flask's request.environ can see AFTER middleware
+    for key, value in request.environ.items():
+        if key.startswith('HTTP_'):
+            app.logger.info(f"DEBUG - request.environ header (Flask's view): {key} = '{value}'")
 # --- END DEBUGGING LOGS ---
 
 
@@ -183,3 +208,4 @@ def import_note():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8099)
+

@@ -1,6 +1,6 @@
 {
   "name": "Notes Addon",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "slug": "notes_addon",
   "description": "Create and manage persistent notes within Home Assistant.",
   "arch": ["aarch64", "amd64", "armv7", "i386"],
