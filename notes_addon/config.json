@@ -1,6 +1,6 @@
 {
   "name": "Notes Addon",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "slug": "notes_addon",
   "description": "Create and manage persistent notes within Home Assistant.",
   "arch": ["aarch64", "amd64", "armv7", "i386"],
@@ -24,5 +24,6 @@
   "init": false,
   "ingress": true,
   "url": "https://github.com/ianpleasance/home-assistant-notes-addon",
+  "icon: icon.png",
   "long_description": "A simple addon for creating, editing, and managing free-form text notes, persistent across reboots and updates. Notes can be stored in a user-defined directory within your Home Assistant /config folder for maximum persistence."
 }
