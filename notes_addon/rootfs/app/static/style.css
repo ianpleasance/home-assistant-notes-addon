@@ -63,10 +63,7 @@ h1 {
     background-color: var(--light-grey-color, #c0c0c0);
 }
 
-.button .mdi {
-    margin-right: 8px;
-    font-size: 1.2em;
-}
+/* REMOVED: .button .mdi rule - no longer needed */
 
 .import-form {
     display: inline-flex; /* To align with other buttons */
@@ -103,38 +100,21 @@ h1 {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding-right: 10px; /* Space before icons */
+    padding-right: 10px; /* Space before buttons */
 }
 
 .note-actions {
     display: flex;
-    gap: 5px; /* Space between icons */
+    gap: 5px; /* Space between buttons */
 }
 
-.icon-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%; /* Make them round */
-    color: var(--secondary-text-color, #757575);
-    text-decoration: none;
-    transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.icon-button:hover {
-    background-color: var(--action-color-hover, rgba(0, 0, 0, 0.04));
-    color: var(--primary-color, #03a9f4);
-}
+/* REMOVED: .icon-button rules - no longer needed */
 
 .delete-button:hover {
     color: var(--error-color, #f44336); /* Red for delete */
 }
 
-.mdi {
-    font-size: 24px; /* Standard icon size */
-}
+/* REMOVED: .mdi rule - no longer needed */
 
 textarea {
     width: calc(100% - 20px); /* Account for padding */
@@ -212,8 +192,5 @@ textarea:focus {
         border-color: var(--dark-primary-color, #4fc3f7);
         box-shadow: 0 0 0 1px var(--dark-primary-color, #4fc3f7);
     }
-    .icon-button:hover {
-        background-color: var(--dark-action-color-hover, rgba(255, 255, 255, 0.08));
-        color: var(--dark-primary-color, #4fc3f7);
-    }
+    /* REMOVED: .icon-button:hover dark mode rule - no longer needed */
 }
