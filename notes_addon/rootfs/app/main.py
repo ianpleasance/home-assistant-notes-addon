@@ -1,19 +1,43 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for
 import logging
-from werkzeug.middleware.proxy_fix import ProxyFix
+# from werkzeug.middleware.proxy_fix import ProxyFix # We no longer need ProxyFix for this specific issue
+
+# --- NEW CUSTOM WSGI MIDDLEWARE ---
+class ReverseProxied:
+    """
+    WSGI middleware to correctly set SCRIPT_NAME and APPLICATION_ROOT
+    when running behind Home Assistant's Ingress.
+    It reads the 'X-Ingress-Path' header provided by Home Assistant.
+    """
+    def __init__(self, app):
+        self.app = app
+
+    def __call__(self, environ, start_response):
+        script_name = environ.get('X-Ingress-Path', '')
+        if script_name:
+            environ['SCRIPT_NAME'] = script_name
+            # Correct PATH_INFO if it starts with the script_name (important for sub-paths)
+            path_info = environ.get('PATH_INFO', '')
+            if path_info.startswith(script_name):
+                environ['PATH_INFO'] = path_info[len(script_name):]
+            # Flask uses APPLICATION_ROOT internally for url_for, set it explicitly
+            environ['APPLICATION_ROOT'] = script_name
+        return self.app(environ, start_response)
+# --- END NEW CUSTOM WSGI MIDDLEWARE ---
+
 
 # Get the absolute path to the directory containing main.py
-# This ensures Flask knows exactly where 'static' and 'templates' are relative to this file.
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 app = Flask(__name__,
             static_folder=os.path.join(BASE_DIR, 'static'),    # Explicit absolute path
             template_folder=os.path.join(BASE_DIR, 'templates')) # Explicit absolute path
 
-# Apply the ProxyFix middleware for Home Assistant Ingress compatibility.
-# x_prefix=1 is crucial for correctly handling the base URL when proxied by HA.
-app.wsgi_app = ProxyFix(app.wsgi_app, x_prefix=1)
+# --- APPLY THE CUSTOM MIDDLEWARE ---
+app.wsgi_app = ReverseProxied(app.wsgi_app)
+# --- END APPLY CUSTOM MIDDLEWARE ---
+
 
 # Configure logging to stdout, which Docker captures.
 logging.basicConfig(level=logging.INFO,
@@ -21,13 +45,12 @@ logging.basicConfig(level=logging.INFO,
                     handlers=[logging.StreamHandler()])
 app.logger.setLevel(logging.INFO)
 
-# --- DEBUGGING LOGS ---
-# This function will run before every request and print valuable path information
+# --- DEBUGGING LOGS (KEEP THESE for now to verify the fix) ---
 @app.before_request
 def log_ingress_path_and_request_info():
     app.logger.info(f"DEBUG - Full Request URL: {request.url}")
     app.logger.info(f"DEBUG - Request Path (after ingress prefix removal): {request.path}")
-    app.logger.info(f"DEBUG - Script Root (Ingress Prefix detected by ProxyFix): {request.script_root}")
+    app.logger.info(f"DEBUG - Script Root (Ingress Prefix detected by Custom Middleware): {request.script_root}") # Updated description
     app.logger.info(f"DEBUG - Base URL (including ingress prefix): {request.base_url}")
     if 'X-Ingress-Path' in request.headers:
         app.logger.info(f"DEBUG - X-Ingress-Path Header from HA: {request.headers['X-Ingress-Path']}")
@@ -37,7 +60,6 @@ def log_ingress_path_and_request_info():
 
 
 # Get notes directory from environment variable set in run.sh.
-# Defaults to '/config/notes' if the environment variable is not set.
 NOTES_DIR = os.environ.get('NOTES_DIR', '/config/notes')
 
 @app.before_request # Use @app.before_request for Flask 2.3+ (replaces before_first_request)
