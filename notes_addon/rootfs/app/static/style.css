@@ -194,3 +194,8 @@ textarea:focus {
     }
     /* REMOVED: .icon-button:hover dark mode rule - no longer needed */
 }
+.note-arrow {
+    margin-right: 8px; /* Space between arrow and text */
+    color: var(--primary-color, #03a9f4); /* Optional: make the arrow the Home Assistant primary color */
+}
+
