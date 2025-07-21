@@ -19,8 +19,8 @@
   "privileged": [],
   "host_network": false,
   "apparmor": false,
-  "webui": "[PROTO:http]://[HOST]:8099",  <-- FIXED THIS LINE
-  "map": ["ssl:rw", "media:rw", "config:rw"],  <-- FIXED THIS LINE (removed addon_config:rw)
+  "webui": "[PROTO:http]://[HOST]:8099",
+  "map": ["ssl:rw", "media:rw", "config:rw"],
   "init": false,
   "ingress": true,
   "url": "https://github.com/ianpleasance/home-assistant-notes-addon",
