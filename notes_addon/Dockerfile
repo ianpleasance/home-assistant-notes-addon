@@ -6,8 +6,8 @@ ENV LANG C.UTF-8
 # Install Python and pip
 RUN apk add --no-cache python3 py3-pip
 
-# Install Flask
-RUN pip install --break-system-packages Flask==2.3.3
+# Install Flask and gunicorn
+RUN pip install --break-system-packages Flask==2.3.3 gunicorn==21.2.0
 
 # Copy application files
 COPY rootfs/app /app

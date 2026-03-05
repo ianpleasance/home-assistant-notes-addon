@@ -8,7 +8,7 @@ A simple Home Assistant addon to create, manage, and store free-form text notes 
 * **Persistent Storage:** Notes are saved as individual text files in a user-definable directory within your Home Assistant's `/config` folder (defaulting to `/config/notes`). This ensures notes persist even if the addon is uninstalled and reinstalled, or if your Home Assistant instance is migrated.
 * **Free-Form Text:** Each note is a simple text file. The **first line** of the file will be used as the note's **title** (truncated to 50 characters in the list view). You can include plain text, Markdown, or even raw HTML within your notes for rich content.
 * **Edit & Delete:** Convenient icons allow you to edit or delete notes directly from the list.
-* **Export/Import:** Easily export all your notes as a `.zip` file for backup, or import notes from a `.zip` file.
+* **Export/Import:** Easily export all your notes as a `.zip` file for backup, or import notes from a `.zip` file containing `.txt` files.
 * **Simple UI:** A clean and straightforward interface.
 
 ## Installation
@@ -43,18 +43,22 @@ A simple Home Assistant addon to create, manage, and store free-form text notes 
 * **Create New Note:** Click the "Create New Note" button. Type your note content. The **first line** you type will be automatically used as the note's title in the list view.
 * **Edit Note:** Click the pencil icon next to a note's title to edit its content.
 * **Delete Note:** Click the trash can icon next to a note's title to delete it. You will be asked for confirmation.
-* **Export Notes:** Click "Export All Notes" to download a zip file containing all your notes.
-* **Import Notes:** Click "Import Notes" and select a zip file containing `.txt` note files. Notes will be added, generating new unique IDs if necessary to prevent overwrites.
+* **Export Notes:** Click "Export All Notes" to download a zip file containing all your notes as `.txt` files.
+* **Import Notes:** Click "Import Notes" and select a `.zip` file. The addon will extract any `.txt` files found inside it into your notes directory. Files with the same name as existing notes will overwrite them.
 
 ## Development
 
 If you want to contribute or modify this addon:
 
-1.  Clone this repository: `git clone https://github.com/YOUR_GITHUB_USERNAME/your-notes-addon-repo.git`
+1.  Clone this repository: `git clone https://github.com/ianpleasance/home-assistant-notes-addon.git`
 2.  The addon's application logic is in `notes_addon/rootfs/app/main.py`.
 3.  Templates for the UI are in `notes_addon/rootfs/app/templates/`.
 4.  Styling is in `notes_addon/rootfs/app/static/`.
 5.  Refer to the [Home Assistant Add-on Documentation](https://developers.home-assistant.io/docs/add-ons/) for more details on addon development.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ## License
 
