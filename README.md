@@ -1,5 +1,9 @@
 # Home Assistant Notes Addon
 
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-c62828.svg)](https://github.com/hacs/integration)
+[![version](https://img.shields.io/github/v/release/ianpleasance/home-assistant-notes-addon?display_name=tag&sort=semver&color=blue&label=version)](https://github.com/ianpleasance/home-assistant-notes-addon/releases/latest)
+[![license](https://img.shields.io/github/license/ianpleasance/home-assistant-notes-addon)](LICENSE)
+
 A simple Home Assistant addon to create, manage, and store free-form text notes directly within your Home Assistant interface. Notes are persistent across reboots and addon updates.
 
 ## Features
